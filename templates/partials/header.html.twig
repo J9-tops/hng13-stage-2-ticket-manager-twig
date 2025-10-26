@@ -1,0 +1,101 @@
+<header class="header">
+  <div class="header-content">
+    <a href="/" class="logo-section">
+      <div class="logo-icon">
+       <svg
+                  fill="none"
+                  viewBox="0 0 48 48"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    clipRule="evenodd"
+                    d="M24 4H42V17.3333V30.6667H24V44H6V30.6667V17.3333H24V4Z"
+                    fill="currentColor"
+                    fillRule="evenodd"
+                  ></path>
+                </svg>
+      </div>
+      <h2 class="logo-text">TicketFlow</h2>
+    </a>
+
+    <div class="nav-buttons">
+      {% if currentUser %}
+        <a href="/dashboard" class="btn btn-login"><span>Dashboard</span></a>
+        <form method="POST" action="/logout" style="display:inline">
+          <button type="submit" class="btn btn-get-started"><span>Logout</span></button>
+        </form>
+      {% else %}
+        <a href="/sign-in" class="btn btn-login"><span>Login</span></a>
+        <a href="/sign-up" class="btn btn-get-started"><span>Get Started</span></a>
+      {% endif %}
+    </div>
+
+    <div class="mobile-menu">
+      <button class="menu-icon" onclick="toggleSidebar()">☰</button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile Sidebar -->
+<div id="mobile-sidebar" class="mobile-sidebar">
+  <div class="sidebar-header">
+    <a href="/" class="logo-section">
+      <div class="logo-icon">
+       <svg
+                  fill="none"
+                  viewBox="0 0 48 48"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    clipRule="evenodd"
+                    d="M24 4H42V17.3333V30.6667H24V44H6V30.6667V17.3333H24V4Z"
+                    fill="currentColor"
+                    fillRule="evenodd"
+                  ></path>
+                </svg>
+      </div>
+      <h2 class="logo-text">TicketFlow</h2>
+    </a>
+    <button class="close-btn" onclick="closeSidebar()">✕</button>
+  </div>
+
+  <div class="sidebar-content">
+    {% if currentUser %}
+      <div class="user-info">
+        <div class="user-avatar">👤</div>
+        <div class="user-details">
+          <p class="user-status">Signed in</p>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/dashboard" class="sidebar-link" onclick="closeSidebar()">Dashboard</a>
+        <form method="POST" action="/logout">
+          <button type="submit" class="sidebar-link logout">Logout</button>
+        </form>
+      </nav>
+    {% else %}
+      <nav class="sidebar-nav">
+        <a href="/sign-in" class="sidebar-link" onclick="closeSidebar()">Login</a>
+        <a href="/sign-up" class="sidebar-link primary" onclick="closeSidebar()">Get Started</a>
+      </nav>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Overlay -->
+<div id="sidebar-overlay" class="sidebar-overlay" onclick="closeSidebar()" style="display:none"></div>
+
+<script>
+  const sidebar = document.getElementById('mobile-sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+
+  function toggleSidebar() {
+    sidebar.classList.toggle('open');
+    overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+  }
+
+  function closeSidebar() {
+    sidebar.classList.remove('open');
+    overlay.style.display = 'none';
+  }
+</script>

@@ -1,0 +1,108 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Landing Page{% endblock %}
+
+{% block content %}
+
+<div class="app">
+  <div class="page-wrapper">
+    <div class="container-main">
+      {% include 'partials/header.html.twig' %}
+
+      <main>
+        <!-- Hero Section -->
+        <section class="hero-section">
+          <div class="wave-background">
+            <svg class="wave" viewBox="0 0 1440 320" preserveAspectRatio="none">
+              <path fill="#E2E8F0" fill-opacity="0.4"
+                d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,128C672,128,768,160,864,165.3C960,171,1056,149,1152,128C1248,107,1344,85,1392,74.7L1440,64L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z">
+              </path>
+            </svg>
+            <svg class="wave wave-2" viewBox="0 0 1440 320" preserveAspectRatio="none">
+              <path fill="#E2E8F0" fill-opacity="0.3"
+                d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,213.3C672,224,768,224,864,208C960,192,1056,160,1152,154.7C1248,149,1344,171,1392,181.3L1440,192L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z">
+              </path>
+            </svg>
+          </div>
+
+          <div class="decorative-circle circle-1"></div>
+          <div class="decorative-circle circle-2"></div>
+          <div class="blob blob-1"></div>
+          <div class="blob blob-2"></div>
+
+          <div class="hero-content">
+            <h1 class="hero-title">Effortless Ticket Management for Modern Teams</h1>
+            <p class="hero-subtitle">
+              Track, organize, and resolve customer requests effortlessly—your ultimate tool for seamless support.
+            </p>
+
+            {% if not currentUser %}
+            <div class="hero-buttons">
+              <a href="/sign-up" class="btn btn-primary"><span>Get Started</span></a>
+              <a href="/sign-in" class="btn btn-secondary"><span>Login</span></a>
+            </div>
+            {% endif %}
+          </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features-section">
+          <div class="features-container">
+            <div class="features-header">
+              <h2 class="features-label">Why Choose TicketFlow?</h2>
+              <p class="features-title">Everything you need to deliver exceptional support</p>
+              <p class="features-description">
+                Our platform is designed to help you manage customer support with ease and efficiency, from the first contact to resolution.
+              </p>
+            </div>
+
+            <div class="features-grid">
+              <div class="feature-card">
+                <div class="feature-icon"><span class="material-symbols-outlined">checklist</span></div>
+                <h3 class="feature-title">Streamlined Workflow</h3>
+                <p class="feature-description">
+                  Organize and prioritize tickets to ensure timely responses and resolutions. Automate repetitive tasks and focus on what matters.
+                </p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-icon"><span class="material-symbols-outlined">groups</span></div>
+                <h3 class="feature-title">Real-time Collaboration</h3>
+                <p class="feature-description">
+                  Work together with your team in real-time to solve customer issues faster. Leave internal notes and see who's working on what.
+                </p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-icon"><span class="material-symbols-outlined">insights</span></div>
+                <h3 class="feature-title">Powerful Analytics</h3>
+                <p class="feature-description">
+                  Gain valuable insights into your support performance with our detailed analytics. Track key metrics and improve your service.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+          <div class="container">
+            <div class="cta-box">
+              <h2>Ready to Transform Your Support?</h2>
+              <p>
+                Join thousands of teams already using TicketFlow to deliver amazing support experiences.
+              </p>
+              <a href="/sign-up" class="btn btn-large">Get Started Free</a>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {# Footer #}
+      {% include 'partials/footer.html.twig' %}
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

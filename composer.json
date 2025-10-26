@@ -1,0 +1,17 @@
+{
+    "name": "ticketflow/twig",
+    "autoload": {
+        "psr-4": {
+            "Ticketflow\\Twig\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "J9-tops",
+            "email": "j9.tops@gmail.com"
+        }
+    ],
+    "require": {
+        "twig/twig": "^3.21"
+    }
+}
