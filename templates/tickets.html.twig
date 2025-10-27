@@ -69,7 +69,10 @@
 </div>
 
 <script>
-
+      const currentUser = localStorage.getItem("ticketapp_session");
+  if (!currentUser) {
+    window.location.href = "/sign-in";
+  }
   const sampleTickets = [
     {
       id: "6f4d5e22-8baf-4b1f-b9e8-24cf29a71b13",

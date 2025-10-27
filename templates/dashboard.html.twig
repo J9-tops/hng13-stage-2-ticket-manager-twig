@@ -55,7 +55,10 @@
 </div>
 
 <script>
-  document.title = "TicketFlow | Dashboard";
+    const currentUser = localStorage.getItem("ticketapp_session");
+  if (!currentUser) {
+    window.location.href = "/sign-in";
+  }
 
   const tableWrapper = document.getElementById("tableWrapper");
   const totalTicketsEl = document.getElementById("totalTickets");
