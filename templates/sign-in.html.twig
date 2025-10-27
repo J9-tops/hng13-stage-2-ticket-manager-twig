@@ -1,0 +1,165 @@
+{% extends 'layouts/base.html.twig' %}
+{% block title %}Sign In - TicketFlow{% endblock %}
+
+{% block content %}
+<div class="auth page-container">
+  <div class="page-content">
+    <div class="form-wrapper">
+      <div class="signin-card">
+        <a href="/" class="logo-section">
+          <div class="logo-icon">
+            <svg
+              fill="none"
+              viewBox="0 0 48 48"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                clip-rule="evenodd"
+                d="M24 4H42V17.3333V30.6667H24V44H6V30.6667V17.3333H24V4Z"
+                fill="currentColor"
+                fill-rule="evenodd"
+              ></path>
+            </svg>
+          </div>
+          <h2 class="logo-text">TicketFlow</h2>
+        </a>
+
+        <div>
+          <h1 class="page-title">Welcome Back</h1>
+          <p>Sign in to continue to your dashboard</p>
+        </div>
+
+        <form id="signin-form" class="form-section" novalidate>
+          <label class="form-label">
+            <span class="label-text">Email</span>
+            <input
+              class="form-input"
+              type="email"
+              name="email"
+              placeholder="jim@abc.com"
+              required
+            />
+            <span class="error-text" data-error="email"></span>
+          </label>
+
+          <label class="form-label">
+            <span class="label-text">Password</span>
+            <div class="password-field">
+              <input
+                class="form-input"
+                name="password"
+                type="password"
+                placeholder="Enter your password"
+                required
+              />
+              <button
+                type="button"
+                id="togglePassword"
+                class="password-icon"
+              >
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
+            </div>
+            <span class="error-text" data-error="password"></span>
+          </label>
+
+          <button type="submit" class="signin-button">Sign In</button>
+        </form>
+
+        <p class="footer-text">
+          Don’t have an account?
+          <a href="/sign-up" class="footer-link">Sign Up</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const currentUser = localStorage.getItem("ticketapp_session");
+  if (currentUser) {
+    window.location.href = "/dashboard";
+  }
+
+  const form = document.getElementById("signin-form");
+  const togglePasswordBtn = document.getElementById("togglePassword");
+  const passwordInput = form.querySelector('input[name="password"]');
+  const emailInput = form.querySelector('input[name="email"]');
+
+  const emailError = document.querySelector('[data-error="email"]');
+  const passwordError = document.querySelector('[data-error="password"]');
+
+  togglePasswordBtn.addEventListener("click", () => {
+    const type = passwordInput.type === "password" ? "text" : "password";
+    passwordInput.type = type;
+    togglePasswordBtn.querySelector("span").textContent =
+      type === "password" ? "visibility" : "visibility_off";
+  });
+
+  function validateSignIn(data) {
+    const errors = {};
+    if (!data.email) {
+      errors.email = "Email is required.";
+    } else if (!/\\S+@\\S+\\.\\S+/.test(data.email)) {
+      errors.email = "Enter a valid email address.";
+    }
+
+    if (!data.password) {
+      errors.password = "Password is required.";
+    } else if (data.password.length < 6) {
+      errors.password = "Password must be at least 6 characters long.";
+    }
+    return errors;
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const data = {
+      email: emailInput.value.trim(),
+      password: passwordInput.value.trim(),
+    };
+
+    const errors = validateSignIn(data);
+    emailError.textContent = errors.email || "";
+    passwordError.textContent = errors.password || "";
+
+    if (Object.keys(errors).length > 0) {
+      Toastify({
+        text: "Please fix the form errors",
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        style: { background: "red" },
+      }).showToast();
+      return;
+    }
+
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    const user = users.find(
+      (u) => u.email === data.email && u.password === data.password
+    );
+
+    if (user) {
+      localStorage.setItem("ticketapp_session", JSON.stringify(user));
+      Toastify({
+        text: "Signing in successful, Redirecting...",
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        style: { background: "green" },
+      }).showToast();
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 500);
+    } else {
+      Toastify({
+        text: "User does not exist",
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        style: { background: "red" },
+      }).showToast();
+    }
+  });
+</script>
+{% endblock %}

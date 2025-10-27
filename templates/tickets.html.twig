@@ -1,0 +1,435 @@
+{% extends 'layouts/dashboard-layout.html.twig' %}
+
+{% block title %}TicketFlow | Manage Tickets{% endblock %}
+
+{% block dashboard_content %}
+
+<div class="app-container tickets">
+  <div style="width: 100%">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Tickets</h1>
+        <p class="page-description">
+          Manage and track all customer support tickets.
+        </p>
+      </div>
+      <button onclick="openCreateTicket()" class="btn-primary create-btn">
+        <span class="icon">add</span>
+        <span>Create Ticket</span>
+      </button>
+    </div>
+
+    <div class="filters-section">
+      <div class="search-wrapper">
+        <span class="icon search-icon">search</span>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search by ticket ID or keyword"
+          class="search-input"
+        />
+      </div>
+      <div class="filter-buttons">
+        <div class="filter-dropdown">
+          <button class="filter-btn" style="border-color: rgb(229, 231, 235); background-color: #fff" onclick="toggleDropdown('status')">
+            <span id="statusFilterLabel">Status</span>
+            <span class="icon">expand_more</span>
+          </button>
+          <div id="statusDropdown" class="dropdown-menu" style="display: none">
+            
+          </div>
+        </div>
+
+        <div class="filter-dropdown">
+          <button class="filter-btn" style="border-color: rgb(229, 231, 235); background-color: #fff" onclick="toggleDropdown('assignee')">
+            <span id="assigneeFilterLabel">Assignee</span>
+            <span class="icon">expand_more</span>
+          </button>
+          <div id="assigneeDropdown" class="dropdown-menu" style="display: none">
+            
+          </div>
+        </div>
+
+        <div class="filter-dropdown">
+          <button class="filter-btn" style="border-color: rgb(229, 231, 235); background-color: #fff" onclick="toggleDropdown('priority')">
+            <span id="priorityFilterLabel">Priority</span>
+            <span class="icon">expand_more</span>
+          </button>
+          <div id="priorityDropdown" class="dropdown-menu" style="display: none">
+           
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tickets-grid" id="ticketsGrid">
+     
+    </div>
+  </div>
+</div>
+
+<script>
+
+  const sampleTickets = [
+    {
+      id: "6f4d5e22-8baf-4b1f-b9e8-24cf29a71b13",
+      uniqueNo: "TKT-001",
+      title: "Login issue with new update",
+      description: "User is unable to log in after the most recent application update on their mobile device.",
+      status: "Open",
+      assignee: "Jane Smith",
+      priority: "High",
+      date: "2025-10-27T00:00:00.000Z",
+      avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuArShpw6PWEaDouaw3iHOM6Sw3K1OKcwMiHDDSp6WQUOpFJktwpvXf0zeklYgpZbt0K9XdP-QPTCh_D6Ec555VePeeJAPtLqsbVprpBQ4Vk1RSWM92eK0VsY3o4xgc9RcBsPi-cEfGfDUTpDKa7qpaTgsKao4iVDxxmujBs6JCC6rfYgUdm8PY6PTLTPBDSVJ6eZUxXSZYcXSC97LmboylPvQ1Sq59rPiZYZIup0r31qeehSI0ZKUOyRfBBUYrpOM2PbMthNFGqueed",
+      lastUpdated: "2025-10-24T19:42:15.312Z",
+    },
+    {
+      id: "9c1f1d7a-2348-4cc6-84e5-9a8d7b6297ef",
+      uniqueNo: "TKT-002",
+      title: "Billing inquiry for invoice #INV-12345",
+      description: "Customer has questions about charges on their latest invoice and needs clarification.",
+      status: "In Progress",
+      assignee: "John Doe",
+      priority: "Medium",
+      date: "2025-10-26T00:00:00.000Z",
+      avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuC7WmZ3NXZ0ZNmZvI-yPmh5KI7aoa4suo0fBTuZOeHsG-ZrR1fiOoih8MH7OrJt1YO6TkPoPfmeP0OZHF_HaEtd7Va1mqiYZEU5AOYvKTEgeoBc3f3yQwXjIs0yeKdC47fJKSFVxFLyZkA-6ncjmhLZEzQEZd97I-mNFFvflptmptRU3--c57VozJHBS0B5gxTnGVr5A2QoSOOt4aH0yGyjnYG39yaOX4EaYBdyt7x8DsLQBCh9TxpQFtr9FH0cpSU1n5pNnnaM46s6",
+      lastUpdated: "2025-10-23T16:28:47.904Z",
+    },
+    {
+      id: "34c2a10d-6a2f-47a4-8c4c-98126b7e7cb3",
+      uniqueNo: "TKT-003",
+      title: "Feature request: Dark mode",
+      description: "User is requesting the implementation of a dark mode theme for better usability in low-light conditions.",
+      status: "Open",
+      assignee: "Alice Johnson",
+      priority: "Low",
+      date: "2025-10-25T00:00:00.000Z",
+      avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuD-7meYACmVV_nk6UcoAVM2t68i4vLGCEFGliosDSG6SAK8VA24LG5YBcktn6GQNNbVRA7zARfbkTCvTztLokEgyFilTA7dBN1g20ZzoObV87tcKgJoxvd0rQXV-B3lZYOu6e6RSE19ARvGQI-HuFdUjwhnKyVe0bSuycwxm7eFQ8Lrw5JZ7vLH15SN4-ZAysEnPkWaA129G9xT_eAlRyb0IpYNBpgCGsWjStjUTUHKQbmdUPNi1-_OwnBaRdQ3l9LNOD8FpPMarr_w",
+      lastUpdated: "2025-10-22T08:55:03.671Z",
+    },
+  ];
+
+  
+  let tickets = [];
+  let searchQuery = "";
+  let statusFilter = [];
+  let assigneeFilter = [];
+  let priorityFilter = [];
+  let openDropdown = null;
+
+  
+  (function initializeTickets() {
+    const saved = localStorage.getItem("tickets");
+    if (saved) {
+      try {
+        tickets = JSON.parse(saved);
+        if (!Array.isArray(tickets)) {
+          tickets = sampleTickets;
+        }
+      } catch (err) {
+        console.error("Error parsing tickets:", err);
+        tickets = sampleTickets;
+      }
+    } else {
+      tickets = sampleTickets;
+      localStorage.setItem("tickets", JSON.stringify(sampleTickets));
+    }
+
+
+
+
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput) {
+      searchInput.addEventListener("input", (e) => {
+        searchQuery = e.target.value;
+        renderTickets();
+      });
+    }
+
+
+    renderFilterOptions();
+    renderTickets();
+
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".filter-dropdown")) {
+        closeAllDropdowns();
+      }
+    });
+  })();
+
+  function getStatusClass(status) {
+    switch (status) {
+      case "Open":
+        return "status-open";
+      case "In Progress":
+        return "status-progress";
+      case "Closed":
+        return "status-closed";
+      default:
+        return "";
+    }
+  }
+
+  function getPriorityClass(priority) {
+    switch (priority) {
+      case "High":
+        return "priority-high";
+      case "Medium":
+        return "priority-medium";
+      case "Low":
+        return "priority-low";
+      default:
+        return "";
+    }
+  }
+
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    const options = { month: "short", day: "numeric" };
+    return date.toLocaleDateString("en-US", options);
+  }
+
+  
+  function createTicketCard(ticket) {
+    return `
+      <div class="ticket-card">
+        <div class="ticket-header">
+          <div>
+            <h3>${ticket.title}</h3>
+            <p class="ticket-id">#${ticket.uniqueNo}</p>
+          </div>
+          <span class="status-badge ${getStatusClass(ticket.status)}">
+            ${ticket.status}
+          </span>
+        </div>
+        <div class="ticket-description">${ticket.description}</div>
+        <div class="ticket-footer">
+          <div class="assignee-info">
+            <img
+              src="${ticket.avatar}"
+              alt="${ticket.assignee}'s avatar"
+              class="avatar"
+            />
+            <span>${ticket.assignee}</span>
+          </div>
+          <div class="ticket-meta">
+            <span class="priority ${getPriorityClass(ticket.priority)}">
+              ${ticket.priority}
+            </span>
+            <span class="date">${formatDate(ticket.date)}</span>
+          </div>
+        </div>
+        <div class="ticket-actions">
+          <button onclick="openEditModal('${ticket.id}')" class="btn-edit">
+            <span class="icon">edit</span>
+            Edit
+          </button>
+          <button onclick="openDeleteModal('${ticket.id}')" class="btn-delete-card">
+            <span class="icon">delete</span>
+            Delete
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  
+  function getFilteredTickets() {
+    return tickets.filter((ticket) => {
+      const matchesSearch =
+        ticket.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        ticket.uniqueNo.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchesStatus =
+        statusFilter.length === 0 || statusFilter.includes(ticket.status);
+      const matchesAssignee =
+        assigneeFilter.length === 0 || assigneeFilter.includes(ticket.assignee);
+      const matchesPriority =
+        priorityFilter.length === 0 || priorityFilter.includes(ticket.priority);
+
+      return matchesSearch && matchesStatus && matchesAssignee && matchesPriority;
+    });
+  }
+
+ 
+  function renderTickets() {
+    const grid = document.getElementById("ticketsGrid");
+    if (!grid) return;
+
+    const filteredTickets = getFilteredTickets();
+
+    if (filteredTickets.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <span class="icon empty-icon">inbox</span>
+          <h3>No Tickets Found</h3>
+          <p>
+            There are no tickets matching your current filters.
+            <br />
+            Try adjusting your search or create a new ticket.
+          </p>
+          <button onclick="openCreateTicket()" class="btn-primary">
+            <span class="icon">add</span>
+            <span>Create Ticket</span>
+          </button>
+        </div>
+      `;
+    } else {
+      grid.innerHTML = filteredTickets.map((ticket) => createTicketCard(ticket)).join("");
+    }
+  }
+
+  
+  function renderFilterOptions() {
+    const uniqueStatuses = [...new Set(tickets.map((t) => t.status))];
+    const uniqueAssignees = [...new Set(tickets.map((t) => t.assignee))];
+    const uniquePriorities = [...new Set(tickets.map((t) => t.priority))];
+
+    
+    const statusDropdown = document.getElementById("statusDropdown");
+    if (statusDropdown) {
+      statusDropdown.innerHTML = uniqueStatuses
+        .map(
+          (status) => `
+        <label class="dropdown-item">
+          <input
+            type="checkbox"
+            value="${status}"
+            onchange="toggleFilter('status', '${status}')"
+            ${statusFilter.includes(status) ? "checked" : ""}
+          />
+          <span>${status}</span>
+        </label>
+      `
+        )
+        .join("");
+    }
+
+  
+    const assigneeDropdown = document.getElementById("assigneeDropdown");
+    if (assigneeDropdown) {
+      assigneeDropdown.innerHTML = uniqueAssignees
+        .map(
+          (assignee) => `
+        <label class="dropdown-item">
+          <input
+            type="checkbox"
+            value="${assignee}"
+            onchange="toggleFilter('assignee', '${assignee}')"
+            ${assigneeFilter.includes(assignee) ? "checked" : ""}
+          />
+          <span>${assignee}</span>
+        </label>
+      `
+        )
+        .join("");
+    }
+
+  
+    const priorityDropdown = document.getElementById("priorityDropdown");
+    if (priorityDropdown) {
+      priorityDropdown.innerHTML = uniquePriorities
+        .map(
+          (priority) => `
+        <label class="dropdown-item">
+          <input
+            type="checkbox"
+            value="${priority}"
+            onchange="toggleFilter('priority', '${priority}')"
+            ${priorityFilter.includes(priority) ? "checked" : ""}
+          />
+          <span>${priority}</span>
+        </label>
+      `
+        )
+        .join("");
+    }
+  }
+
+
+  function toggleFilter(filterType, value) {
+    if (filterType === "status") {
+      if (statusFilter.includes(value)) {
+        statusFilter = statusFilter.filter((v) => v !== value);
+      } else {
+        statusFilter.push(value);
+      }
+      updateFilterLabel("statusFilterLabel", "Status", statusFilter.length);
+    } else if (filterType === "assignee") {
+      if (assigneeFilter.includes(value)) {
+        assigneeFilter = assigneeFilter.filter((v) => v !== value);
+      } else {
+        assigneeFilter.push(value);
+      }
+      updateFilterLabel("assigneeFilterLabel", "Assignee", assigneeFilter.length);
+    } else if (filterType === "priority") {
+      if (priorityFilter.includes(value)) {
+        priorityFilter = priorityFilter.filter((v) => v !== value);
+      } else {
+        priorityFilter.push(value);
+      }
+      updateFilterLabel("priorityFilterLabel", "Priority", priorityFilter.length);
+    }
+
+    renderTickets();
+  }
+
+ 
+  function updateFilterLabel(labelId, baseName, count) {
+    const label = document.getElementById(labelId);
+    if (label) {
+      label.textContent = count > 0 ? `${baseName} (${count})` : baseName;
+    }
+  }
+
+
+  function toggleDropdown(dropdownType) {
+    event.stopPropagation();
+    
+    if (openDropdown === dropdownType) {
+      closeAllDropdowns();
+    } else {
+      closeAllDropdowns();
+      openDropdown = dropdownType;
+      const dropdown = document.getElementById(`${dropdownType}Dropdown`);
+      if (dropdown) {
+        dropdown.style.display = "block";
+      }
+    }
+  }
+
+
+  function closeAllDropdowns() {
+    openDropdown = null;
+    ["statusDropdown", "assigneeDropdown", "priorityDropdown"].forEach((id) => {
+      const dropdown = document.getElementById(id);
+      if (dropdown) {
+        dropdown.style.display = "none";
+      }
+    });
+  }
+
+  
+  function openCreateTicket() {
+  updateModal({ status: "open", modalType: "create" });
+}
+
+function openEditModal(ticketId) {
+  const ticket = tickets.find((t) => t.id === ticketId);
+  if (ticket) {
+    window.editTicketData = ticket;
+    updateModal({ status: "open", modalType: "update" });
+  }
+}
+
+function openDeleteModal(ticketId) {
+  const ticket = tickets.find((t) => t.id === ticketId);
+  if (ticket) {
+    window.deleteTicketData = ticket;
+    updateModal({ status: "open", modalType: "delete" });
+  }
+}
+</script>
+
+
+{% endblock %}

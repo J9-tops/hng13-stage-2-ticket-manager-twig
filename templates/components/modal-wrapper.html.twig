@@ -1,0 +1,71 @@
+<div id="modal-root"></div>
+
+<template id="create-modal-template">
+  {% include 'components/modals/create-ticket.html.twig' %}
+</template>
+<template id="update-modal-template">
+  {% include 'components/modals/update-ticket.html.twig' %}
+</template>
+<template id="delete-modal-template">
+  {% include 'components/modals/delete-ticket.html.twig' %}
+</template>
+<template id="logout-modal-template">
+  {% include 'components/modals/logout.html.twig' %}
+</template>
+
+<script>
+let modalState = { status: "close", modalType: "logout" };
+
+function updateModal(newModalState) {
+  modalState = newModalState;
+  renderModal();
+}
+
+function renderModal() {
+  const modalRoot = document.getElementById("modal-root");
+  
+  if (modalState.status === "close") {
+    modalRoot.innerHTML = "";
+    return;
+  }
+
+  let template;
+  switch(modalState.modalType) {
+    case "create":
+      template = document.getElementById("create-modal-template");
+      break;
+    case "update":
+      template = document.getElementById("update-modal-template");
+      break;
+    case "delete":
+      template = document.getElementById("delete-modal-template");
+      break;
+    case "logout":
+      template = document.getElementById("logout-modal-template");
+      break;
+  }
+
+  const modalContent = template.content.cloneNode(true);
+  
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.appendChild(modalContent);
+  
+  modalRoot.innerHTML = "";
+  modalRoot.appendChild(overlay);
+
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) {
+      updateModal({ status: "close", modalType: modalState.modalType });
+    }
+  });
+}
+
+window.updateModal = updateModal;
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && modalState.status === "open") {
+    updateModal({ status: "close", modalType: modalState.modalType });
+  }
+});
+</script>

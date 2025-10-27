@@ -1,0 +1,139 @@
+<header class="header">
+  <div class="header-content">
+    <a href="/" class="logo-section">
+      <div class="logo-icon">
+        <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <path
+            clip-rule="evenodd"
+            d="M24 4H42V17.3333V30.6667H24V44H6V30.6667V17.3333H24V4Z"
+            fill="currentColor"
+            fill-rule="evenodd"
+          />
+        </svg>
+      </div>
+      <h2 class="logo-text">TicketFlow</h2>
+    </a>
+
+    <nav class="nav-links">
+      <a href="/dashboard" class="nav-link" data-active="dashboard">Overview</a>
+      <a href="/dashboard/tickets" class="nav-link" data-active="tickets">Manage Tickets</a>
+    </nav>
+
+    <div class="nav-buttons">
+      <button class="btn-primary" id="logoutBtn">Logout</button>
+      <button class="menu-btn" id="menuBtn">
+        <span class="icon">☰</span>
+      </button>
+      <div id="sidebarOverlay"></div>
+    </div>
+
+    
+    
+    <div id="sidebar" class="sidebar">
+    
+      <div class="sidebar-header">
+        <h2 class="sidebar-title">Menu</h2>
+        <button id="sidebarClose" class="sidebar-close">✕</button>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/dashboard" class="sidebar-link" data-active="dashboard">Overview</a>
+        <a href="/dashboard/tickets" class="sidebar-link" data-active="tickets">Manage Tickets</a>
+        <button id="sidebarLogout" class="sidebar-logout">Logout</button>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const sidebar = document.getElementById("sidebar");
+    const overlayContainer = document.getElementById("sidebarOverlay");
+    const menuBtn = document.getElementById("menuBtn");
+    const closeBtn = document.getElementById("sidebarClose");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const sidebarLogout = document.getElementById("sidebarLogout");
+
+    let isSidebarOpen = false;
+
+    const setActiveNavigation = () => {
+      const currentPath = window.location.pathname;
+      const navLinks = document.querySelectorAll('.nav-link');
+      const sidebarLinks = document.querySelectorAll('.sidebar-link');
+
+      let currentRoute = '';
+      if (currentPath === '/dashboard' || currentPath === '/dashboard/') {
+        currentRoute = 'dashboard';
+      } else if (currentPath.includes('/dashboard/tickets')) {
+        currentRoute = 'tickets';
+      }
+      
+      navLinks.forEach(link => {
+        const linkRoute = link.getAttribute('data-active');
+        if (linkRoute === currentRoute) {
+          link.style.fontWeight = "700";
+          link.style.color = " rgb(19, 164, 236)";
+          link.classList.add('active');
+        } else {
+          link.style.fontWeight = "normal";
+          link.style.color = "rgb(51, 51, 51)";
+          link.classList.remove('active');
+        }
+      });
+
+      
+      sidebarLinks.forEach(link => {
+        const linkRoute = link.getAttribute('data-active');
+        if (linkRoute === currentRoute) {
+          link.style.fontWeight = '700';
+          link.style.backgroundColor = 'rgba(19, 164, 236, 0.1)';
+          link.style.color = 'rgb(19, 164, 236)';
+          link.classList.add('active');
+        } else {
+          link.style.fontWeight = 'normal';
+          link.style.backgroundColor = 'transparent';
+          link.style.color = 'rgb(51, 51, 51)';
+          link.classList.remove('active');
+        }
+      });
+    };
+
+    setActiveNavigation();
+
+    const renderOverlay = () => {
+      if (isSidebarOpen) {
+        overlayContainer.innerHTML = '<div class="sidebar-overlay"></div>';
+        const overlay = overlayContainer.querySelector('.sidebar-overlay');
+        overlay?.addEventListener("click", closeSidebar);
+      } else {
+        overlayContainer.innerHTML = '';
+      }
+    };
+
+    const toggleSidebar = () => {
+      isSidebarOpen = !isSidebarOpen;
+      if (isSidebarOpen) {
+        sidebar.classList.add("sidebar-open");
+      } else {
+        sidebar.classList.remove("sidebar-open");
+      }
+      renderOverlay();
+    };
+
+    const closeSidebar = () => {
+      isSidebarOpen = false;
+      sidebar.classList.remove("sidebar-open");
+      renderOverlay();
+    };
+
+    menuBtn?.addEventListener("click", toggleSidebar);
+    closeBtn?.addEventListener("click", closeSidebar);
+
+    const openLogoutModal = () => {
+      closeSidebar();
+      window.updateModal({ modalType: "logout", status: "open" });
+    };
+
+    logoutBtn?.addEventListener("click", openLogoutModal);
+    sidebarLogout?.addEventListener("click", openLogoutModal);
+  });
+</script>

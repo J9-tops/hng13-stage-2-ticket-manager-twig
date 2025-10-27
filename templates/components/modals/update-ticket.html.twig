@@ -1,0 +1,258 @@
+<div class="modal-content" onclick="event.stopPropagation()">
+  <div class="modal-header">
+    <h2>Edit Ticket</h2>
+    <button class="close-button" onclick="closeModal()">
+      <span class="icon">close</span>
+    </button>
+  </div>
+
+  <form id="editTicketForm" class="modal-form">
+    <input type="hidden" id="edit-ticket-id" />
+    
+    <div>
+      <label for="edit-title">
+        Ticket Title <span class="required">*</span>
+      </label>
+      <input id="edit-title" type="text" />
+      <p class="error-text" id="error-title"></p>
+    </div>
+
+    <div>
+      <label for="edit-description">Description</label>
+      <textarea id="edit-description" rows="4"></textarea>
+      <p class="error-text" id="error-description"></p>
+    </div>
+
+    <div class="form-row">
+      <div>
+        <label for="edit-assignee">Assignee</label>
+        <select id="edit-assignee">
+          <option>Jane Smith</option>
+          <option>John Doe</option>
+          <option>Alice Johnson</option>
+        </select>
+        <p class="error-text" id="error-assignee"></p>
+      </div>
+
+      <div>
+        <label for="edit-priority">Priority</label>
+        <select id="edit-priority">
+          <option>Low</option>
+          <option>Medium</option>
+          <option>High</option>
+        </select>
+        <p class="error-text" id="error-priority"></p>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div>
+        <label for="edit-status">Status</label>
+        <select id="edit-status">
+          <option>Open</option>
+          <option>In Progress</option>
+          <option>Closed</option>
+        </select>
+        <p class="error-text" id="error-status"></p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button type="submit" class="btn-primary">Save Changes</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function closeModal() {
+    const overlay = document.querySelector(".modal-overlay");
+    if (overlay) overlay.remove();
+  }
+
+  function validateTicketForm(formData) {
+    const errors = {};
+
+    if (!formData.title.trim()) {
+      errors.title = "Title is required.";
+    } else if (formData.title.trim().length < 3) {
+      errors.title = "Title must be at least 3 characters long.";
+    }
+
+    if (formData.description && formData.description.trim().length < 5) {
+      errors.description = "Description must be at least 5 characters long.";
+    }
+
+    if (!formData.assignee || !formData.assignee.trim()) {
+      errors.assignee = "Please select an assignee.";
+    }
+
+    if (!["Low", "Medium", "High"].includes(formData.priority)) {
+      errors.priority = "Invalid priority selected.";
+    }
+
+    if (!["Open", "In Progress", "Closed"].includes(formData.status)) {
+      errors.status = "Invalid status selected.";
+    }
+
+    return errors;
+  }
+
+  (function() {
+    const form = document.getElementById("editTicketForm");
+    if (!form) {
+      console.error("Edit form not found!");
+      return;
+    }
+
+    const ticketData = window.editTicketData;
+    
+    if (ticketData) {
+      document.getElementById("edit-ticket-id").value = ticketData.id || "";
+      document.getElementById("edit-title").value = ticketData.title || "";
+      document.getElementById("edit-description").value = ticketData.description || "";
+      document.getElementById("edit-assignee").value = ticketData.assignee || "Jane Smith";
+      document.getElementById("edit-priority").value = ticketData.priority || "Low";
+      document.getElementById("edit-status").value = ticketData.status || "Open";
+    }
+
+    ["edit-title", "edit-description", "edit-assignee", "edit-priority", "edit-status"].forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.addEventListener("input", () => {
+          const errorId = `error-${fieldId.replace("edit-", "")}`;
+          const errorEl = document.getElementById(errorId);
+          if (errorEl) errorEl.textContent = "";
+        });
+      }
+    });
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      console.log("Edit form submitted");
+
+      try {
+        const ticketId = document.getElementById("edit-ticket-id").value;
+        const title = document.getElementById("edit-title").value;
+        const description = document.getElementById("edit-description").value;
+        const assignee = document.getElementById("edit-assignee").value;
+        const priority = document.getElementById("edit-priority").value;
+        const status = document.getElementById("edit-status").value;
+
+        const formData = {
+          title: title,
+          description: description,
+          assignee: assignee,
+          priority: priority,
+          status: status
+        };
+
+        console.log("Form data:", formData);
+
+        ["title", "description", "assignee", "priority", "status"].forEach(field => {
+          const errorEl = document.getElementById(`error-${field}`);
+          if (errorEl) errorEl.textContent = "";
+        });
+
+        const validationErrors = validateTicketForm(formData);
+
+        console.log("Validation errors:", validationErrors);
+
+        if (Object.keys(validationErrors).length > 0) {
+          Object.entries(validationErrors).forEach(([field, message]) => {
+            const errorEl = document.getElementById(`error-${field}`);
+            if (errorEl) errorEl.textContent = message;
+          });
+          
+          if (typeof Toastify !== 'undefined') {
+            Toastify({
+              text: "Please fix the errors before saving.",
+              duration: 3000,
+              gravity: "top",
+              position: "right",
+              backgroundColor: "#f44336",
+            }).showToast();
+          }
+          return;
+        }
+
+        const JSONTickets = localStorage.getItem("tickets");
+        const storedTickets = JSONTickets ? JSON.parse(JSONTickets) : [];
+
+        if (!ticketId) {
+          if (typeof Toastify !== 'undefined') {
+            Toastify({
+              text: "Could not identify the ticket to edit.",
+              duration: 3000,
+              gravity: "top",
+              position: "right",
+              backgroundColor: "#f44336",
+            }).showToast();
+          }
+          return;
+        }
+
+        const foundTicket = storedTickets.some(ticket => ticket.id === ticketId);
+        if (!foundTicket) {
+          if (typeof Toastify !== 'undefined') {
+            Toastify({
+              text: "Ticket not found. It may have been deleted already.",
+              duration: 3000,
+              gravity: "top",
+              position: "right",
+              backgroundColor: "#f44336",
+            }).showToast();
+          }
+          return;
+        }
+
+        const updatedTickets = storedTickets.map(ticket => 
+          ticket.id === ticketId
+            ? {
+                ...ticket,
+                title: title,
+                description: description,
+                assignee: assignee,
+                priority: priority,
+                status: status,
+                lastUpdated: new Date().toISOString(),
+              }
+            : ticket
+        );
+
+        localStorage.setItem("tickets", JSON.stringify(updatedTickets));
+
+        console.log("Ticket updated successfully");
+
+        if (typeof Toastify !== 'undefined') {
+          Toastify({
+            text: "Ticket updated successfully!",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#4CAF50",
+          }).showToast();
+        }
+
+        setTimeout(() => {
+          closeModal();
+          window.location.reload();
+        }, 1000);
+
+      } catch (error) {
+        console.error("Error updating ticket:", error);
+        if (typeof Toastify !== 'undefined') {
+          Toastify({
+            text: "Something went wrong while updating the ticket.",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#f44336",
+          }).showToast();
+        }
+      }
+    });
+  })();
+</script>

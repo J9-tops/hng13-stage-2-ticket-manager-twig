@@ -1,0 +1,48 @@
+<div class="modal-content delete-modal" onclick="event.stopPropagation()">
+  <div class="delete-modal-content">
+    <div class="delete-icon-wrapper">
+      <span class="icon delete-icon">warning</span>
+    </div>
+    <h3>Logout Now?</h3>
+    <p>Are you sure you want to log out?</p>
+  </div>
+
+  <div class="delete-modal-footer">
+    <button class="btn-secondary" onclick="closeLogoutModal()">Cancel</button>
+    <button class="btn-delete" onclick="confirmLogout()">Confirm</button>
+  </div>
+</div>
+
+<script>
+function closeLogoutModal() {
+  const overlay = document.querySelector(".modal-overlay");
+  if (overlay) overlay.remove();
+}
+
+function confirmLogout() {
+  try {
+    localStorage.removeItem("ticketapp_session");
+
+    Toastify({
+      text: "Logged out successfully!",
+      duration: 2000,
+      gravity: "top",
+      position: "right",
+      backgroundColor: "#4CAF50",
+    }).showToast();
+
+    setTimeout(() => {
+      window.location.href = "/sign-in";
+    }, 800);
+  } catch (err) {
+    console.error("Logout error:", err);
+    Toastify({
+      text: "Failed to log out. Please try again.",
+      duration: 3000,
+      gravity: "top",
+      position: "right",
+      backgroundColor: "#f44336",
+    }).showToast();
+  }
+}
+</script>

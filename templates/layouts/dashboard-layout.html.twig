@@ -1,0 +1,15 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block content %}
+  {% include 'components/modal-wrapper.html.twig' %}
+
+  <div class="light dashboard">
+    <div class="container">
+      {% include 'components/dashboard-header.html.twig' %}
+
+      <main class="main-content">
+        {% block dashboard_content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+{% endblock %}

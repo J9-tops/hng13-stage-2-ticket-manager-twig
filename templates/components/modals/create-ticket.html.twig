@@ -1,0 +1,220 @@
+<div class="modal-content" onclick="event.stopPropagation()">
+  <div class="modal-header">
+    <h2>Create New Ticket</h2>
+    <button class="close-button" onclick="closeModal()">
+      <span class="icon">close</span>
+    </button>
+  </div>
+
+  <form id="createTicketForm" class="modal-form">
+    <div>
+      <label for="create-ticket-title">
+        Ticket Title <span class="required">*</span>
+      </label>
+      <input id="create-ticket-title" type="text" />
+      <p class="error-text" id="error-title"></p>
+    </div>
+
+    <div>
+      <label for="create-ticket-description">Description</label>
+      <textarea id="create-ticket-description" rows="4"></textarea>
+      <p class="error-text" id="error-description"></p>
+    </div>
+
+    <div class="form-row">
+      <div>
+        <label for="create-assignee">Assignee</label>
+        <select id="create-assignee">
+          <option>Jane Smith</option>
+          <option>John Doe</option>
+          <option>Alice Johnson</option>
+        </select>
+        <p class="error-text" id="error-assignee"></p>
+      </div>
+
+      <div>
+        <label for="create-priority">Priority</label>
+        <select id="create-priority">
+          <option>Low</option>
+          <option>Medium</option>
+          <option>High</option>
+        </select>
+        <p class="error-text" id="error-priority"></p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button type="submit" class="btn-primary">Create Ticket</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function closeModal() {
+    const overlay = document.querySelector(".modal-overlay");
+    if (overlay) overlay.remove();
+  }
+
+  function validateTicketForm(formData) {
+    const errors = {};
+
+    if (!formData.title.trim()) {
+      errors.title = "Title is required.";
+    } else if (formData.title.trim().length < 3) {
+      errors.title = "Title must be at least 3 characters long.";
+    }
+
+    if (formData.description && formData.description.trim().length < 5) {
+      errors.description = "Description must be at least 5 characters long.";
+    }
+
+    if (!formData.assignee || !formData.assignee.trim()) {
+      errors.assignee = "Please select an assignee.";
+    }
+
+    if (!["Low", "Medium", "High"].includes(formData.priority)) {
+      errors.priority = "Invalid priority selected.";
+    }
+
+    return errors;
+  }
+
+  (function() {
+    const form = document.getElementById("createTicketForm");
+    if (!form) {
+      console.error("Form not found!");
+      return;
+    }
+
+    const assigneeSelect = document.getElementById("create-assignee");
+    const prioritySelect = document.getElementById("create-priority");
+    
+    if (assigneeSelect) assigneeSelect.value = "Jane Smith";
+    if (prioritySelect) prioritySelect.value = "Low";
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      console.log("Form submitted");
+
+      const title = document.getElementById("create-ticket-title").value;
+      const description = document.getElementById("create-ticket-description").value;
+      const assignee = document.getElementById("create-assignee").value;
+      const priority = document.getElementById("create-priority").value;
+
+      const formData = {
+        title: title,
+        description: description,
+        assignee: assignee,
+        priority: priority,
+        status: "Open"
+      };
+
+      console.log("Form data:", formData);
+
+      ["title", "description", "assignee", "priority"].forEach(field => {
+        const errorEl = document.getElementById(`error-${field}`);
+        if (errorEl) errorEl.textContent = "";
+      });
+
+      const errors = validateTicketForm(formData);
+
+      console.log("Validation errors:", errors);
+
+      if (Object.keys(errors).length > 0) {
+        Object.entries(errors).forEach(([field, message]) => {
+          const errorEl = document.getElementById(`error-${field}`);
+          if (errorEl) errorEl.textContent = message;
+        });
+        return;
+      }
+
+      try {
+        const stored = localStorage.getItem("tickets");
+        let storedTickets = [];
+        
+        try {
+          if (stored) {
+            storedTickets = JSON.parse(stored);
+            if (!Array.isArray(storedTickets)) {
+              throw new Error("Invalid data format");
+            }
+          } else {
+            storedTickets = [];
+          }
+        } catch (err) {
+          console.error("Error parsing tickets from localStorage:", err);
+          storedTickets = [];
+        }
+
+        console.log("Stored tickets:", storedTickets);
+
+        const uniqueNumber = `TKT-${String(storedTickets.length + 1).padStart(3, "0")}`;
+
+        const newTicket = {
+          id: crypto.randomUUID(),
+          uniqueNo: uniqueNumber,
+          title: formData.title,
+          description: formData.description,
+          assignee: formData.assignee,
+          priority: formData.priority,
+          status: "Open",
+          date: new Date().toISOString(),
+          avatar: formData.assignee
+            ? `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(formData.assignee)}`
+            : "",
+          lastUpdated: new Date().toISOString(),
+        };
+
+        console.log("New ticket:", newTicket);
+
+        try {
+          const updatedTickets = [...storedTickets, newTicket];
+          localStorage.setItem("tickets", JSON.stringify(updatedTickets));
+          
+          console.log("Ticket saved to localStorage");
+
+          if (typeof Toastify !== 'undefined') {
+            Toastify({
+              text: "Ticket created successfully!",
+              duration: 3000,
+              gravity: "top",
+              position: "right",
+              backgroundColor: "#4CAF50",
+            }).showToast();
+          }
+
+          setTimeout(() => {
+            closeModal();
+            window.location.reload();
+          }, 1000);
+        } catch (err) {
+          console.error("Error saving ticket:", err);
+          if (typeof Toastify !== 'undefined') {
+            Toastify({
+              text: "Failed to save ticket. Please try again.",
+              duration: 3000,
+              gravity: "top",
+              position: "right",
+              backgroundColor: "#f44336",
+            }).showToast();
+          }
+          return;
+        }
+      } catch (error) {
+        console.error("Unexpected error while creating ticket:", error);
+        if (typeof Toastify !== 'undefined') {
+          Toastify({
+            text: "Something went wrong while creating the ticket.",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#f44336",
+          }).showToast();
+        }
+      }
+    });
+  })();
+</script>

@@ -1,0 +1,172 @@
+{% extends 'layouts/dashboard-layout.html.twig' %}
+
+{% block title %}TicketFlow | Dashboard{% endblock %}
+
+{% block dashboard_content %}
+<div class="light">
+  <div class="container">
+    <div class="content-wrapper">
+      <div class="page-header">
+        <p class="page-title">Dashboard</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <p class="stat-label">Total Tickets</p>
+            <span class="stat-icon" style="color: var(--text-secondary);">🎫</span>
+          </div>
+          <p id="totalTickets" class="stat-value">0</p>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <p class="stat-label">Open Tickets</p>
+            <span class="stat-icon stat-warning">📂</span>
+          </div>
+          <p id="openTickets" class="stat-value stat-warning">0</p>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <p class="stat-label">Resolved Tickets</p>
+            <span class="stat-icon stat-success">✓</span>
+          </div>
+          <p id="closedTickets" class="stat-value stat-success">0</p>
+        </div>
+      </div>
+
+      <div class="activity-section">
+        <h3 class="section-title">Recent Activity</h3>
+        <div id="tableWrapper" class="table-wrapper">
+          <div class="empty-state">
+            <span className="icon empty-icon">inbox</span>
+            <h3>No Tickets Found</h3>
+            <p>Create a new ticket.</p>
+            <button id="createTicketBtn" class="btn-primary">
+              <span className="icon">add</span>
+              <span>Create First Ticket</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.title = "TicketFlow | Dashboard";
+
+  const tableWrapper = document.getElementById("tableWrapper");
+  const totalTicketsEl = document.getElementById("totalTickets");
+  const openTicketsEl = document.getElementById("openTickets");
+  const closedTicketsEl = document.getElementById("closedTickets");
+  const createTicketBtn = document.getElementById("createTicketBtn");
+
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "Open": return "status-open";
+      case "Closed": return "status-closed";
+      case "In Progress": return "status-progress";
+      default: return "";
+    }
+  };
+
+  function openCreateTicket() {
+     window.updateModal({ modalType: "create", status: "open" });
+  }
+
+  createTicketBtn?.addEventListener("click", openCreateTicket);
+
+  const getRelativeTime = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 60) return diffMins <= 1 ? "Just now" : `${diffMins} minutes ago`;
+    else if (diffHours < 24) return diffHours === 1 ? "1 hour ago" : `${diffHours} hours ago`;
+    else if (diffDays < 7) return diffDays === 1 ? "1 day ago" : `${diffDays} days ago`;
+    else return date.toLocaleDateString();
+  };
+
+  function loadTickets() {
+    const saved = localStorage.getItem("tickets");
+    let tickets = [];
+    if (saved) {
+      try {
+        tickets = JSON.parse(saved);
+      } catch (error) {
+        console.error("Error parsing tickets:", error);
+      }
+    }
+
+    const stats = {
+      total: tickets.length,
+      open: tickets.filter((t) => t.status === "Open").length,
+      closed: tickets.filter((t) => t.status === "Closed").length,
+    };
+
+    totalTicketsEl.textContent = stats.total;
+    openTicketsEl.textContent = stats.open;
+    closedTicketsEl.textContent = stats.closed;
+
+    const recentTickets = [...tickets]
+      .sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated))
+      .slice(0, 4);
+
+    if (recentTickets.length === 0) {
+      tableWrapper.innerHTML = `
+        <div class="empty-state">
+          <span className="icon empty-icon">inbox</span>
+          <h3>No Tickets Found</h3>
+          <p>Create a new ticket.</p>
+          <button id="createTicketBtn" class="btn-primary">
+            <span className="icon">add</span>
+            <span>Create First Ticket</span>
+          </button>
+        </div>
+      `;
+      document.getElementById("createTicketBtn").addEventListener("click", openCreateTicket);
+      return;
+    }
+
+    const rows = recentTickets.map((ticket) => `
+      <tr>
+        <td class="ticket-id">${ticket.uniqueNo}</td>
+        <td class="ticket-subject">${ticket.title}</td>
+        <td>
+          <span class="status-badge ${getStatusClass(ticket.status)}">${ticket.status}</span>
+        </td>
+        <td class="ticket-subject">${getRelativeTime(ticket.lastUpdated)}</td>
+        <td style="text-align:right;"><a class="view-link" href="#">View</a></td>
+      </tr>
+    `).join("");
+
+    tableWrapper.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Ticket ID</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Last Updated</th>
+            <th><span class="sr-only">View</span></th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
+  }
+
+  loadTickets();
+
+  window.addEventListener("storage", (e) => {
+    if (e.key === "tickets") loadTickets();
+  });
+
+  window.addEventListener("ticketsUpdated", loadTickets);
+</script>
+{% endblock %}

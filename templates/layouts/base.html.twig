@@ -6,15 +6,19 @@
   <title>{% block title %}TicketFlow{% endblock %}</title>
 
   
-  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="/css/index.css">
 
  
   <link
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
       rel="stylesheet"
     />
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 </head>
 <body>
+    <div id="sonner-container"></div>
     {% block content %}{% endblock %}
 </body>
 </html>
