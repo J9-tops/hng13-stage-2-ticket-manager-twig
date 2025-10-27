@@ -28,7 +28,13 @@
             <span class="label-text">Password</span>
             <div class="password-field">
               <input class="form-input" name="password" type="password" placeholder="Enter your password" />
-              <button type="button" id="togglePassword" class="password-icon">👁️</button>
+             <button
+                type="button"
+                id="togglePassword"
+                class="password-icon"
+              >
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
             </div>
             <span class="error-text" id="passwordError"></span>
           </label>
@@ -58,7 +64,10 @@
   const togglePassword = document.getElementById("togglePassword");
 
   togglePassword.addEventListener("click", () => {
-    passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+    const type = passwordInput.type === "password" ? "text" : "password";
+    passwordInput.type = type;
+    togglePassword.querySelector("span").textContent =
+      type === "password" ? "visibility" : "visibility_off";
   });
 
   const validateSignUp = (data) => {

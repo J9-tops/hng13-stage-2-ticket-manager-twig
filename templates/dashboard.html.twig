@@ -3,6 +3,7 @@
 {% block title %}TicketFlow | Dashboard{% endblock %}
 
 {% block dashboard_content %}
+
 <div class="light">
   <div class="container">
     <div class="content-wrapper">
@@ -40,11 +41,11 @@
         <h3 class="section-title">Recent Activity</h3>
         <div id="tableWrapper" class="table-wrapper">
           <div class="empty-state">
-            <span className="icon empty-icon">inbox</span>
+            <span class="icon empty-icon">inbox</span>
             <h3>No Tickets Found</h3>
             <p>Create a new ticket.</p>
             <button id="createTicketBtn" class="btn-primary">
-              <span className="icon">add</span>
+               <span class="icon">add</span>
               <span>Create First Ticket</span>
             </button>
           </div>
@@ -123,11 +124,11 @@
     if (recentTickets.length === 0) {
       tableWrapper.innerHTML = `
         <div class="empty-state">
-          <span className="icon empty-icon">inbox</span>
+          <span class="icon empty-icon">inbox</span>
           <h3>No Tickets Found</h3>
           <p>Create a new ticket.</p>
           <button id="createTicketBtn" class="btn-primary">
-            <span className="icon">add</span>
+            <span class="icon">add</span>
             <span>Create First Ticket</span>
           </button>
         </div>
