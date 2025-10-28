@@ -17,7 +17,7 @@ This README explains what is implemented, how to run the app, where key UI piece
 - Authentication screens: Sign In and Sign Up with client-side validation (`templates/auth/login.html.twig`, `templates/auth/signup.html.twig`).
 - Dashboard overview with cards for ticket stats and navigation to Tickets screen (`templates/dashboard.html.twig` and `templates/layouts/dashboard-layout.html.twig`).
 - Ticket management screen with modal components in `templates/components/modals/` for create/update/delete flows.
-- Session-based authentication and JSON file-based storage for users and tickets.
+- Session-based authentication and localstorage-based storage for users and tickets.
 
 ## How to run (local)
 
@@ -35,6 +35,8 @@ docker run -p 8080:80 ticket-manager
 ```
 
 Then visit `http://localhost:8080` in your browser.
+
+Accessing `http://localhost:8080/dashboard/tickets` first generates sample tickets.
 
 ## Authentication & session
 

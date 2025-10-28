@@ -35,12 +35,9 @@
               Track, organize, and resolve customer requests effortlessly—your ultimate tool for seamless support.
             </p>
 
-            {% if not currentUser %}
-            <div class="hero-buttons">
-              <a href="/auth/signup" class="btn btn-primary"><span>Get Started</span></a>
-              <a href="/auth/login" class="btn btn-secondary"><span>Login</span></a>
+            <div class="hero-buttons" id="hero-buttons">
+              <!-- Buttons will be rendered by JavaScript based on auth state -->
             </div>
-            {% endif %}
           </div>
         </section>
 
@@ -101,5 +98,24 @@
     </div>
   </div>
 </div>
+
+<script>
+  function initHeroButtons() {
+    const userJSON = localStorage.getItem("ticketapp_session");
+    const heroButtons = document.getElementById('hero-buttons');
+    
+    if (!userJSON) {
+      heroButtons.innerHTML = `
+        <a href="/auth/signup" class="btn btn-primary"><span>Get Started</span></a>
+        <a href="/auth/login" class="btn btn-secondary"><span>Login</span></a>
+      `;
+      heroButtons.style.display = 'flex';
+    } else {
+      heroButtons.style.display = 'none';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', initHeroButtons);
+</script>
 
 {% endblock %}

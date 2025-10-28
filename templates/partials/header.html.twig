@@ -2,98 +2,179 @@
   <div class="header-content">
     <a href="/" class="logo-section">
       <div class="logo-icon">
-       <svg
-                  fill="none"
-                  viewBox="0 0 48 48"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    clipRule="evenodd"
-                    d="M24 4H42V17.3333V30.6667H24V44H6V30.6667V17.3333H24V4Z"
-                    fill="currentColor"
-                    fillRule="evenodd"
-                  ></path>
-                </svg>
+        <svg
+          fill="none"
+          viewBox="0 0 48 48"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            clipRule="evenodd"
+            d="M24 4H42V17.3333V30.6667H24V44H6V30.6667V17.3333H24V4Z"
+            fill="currentColor"
+            fillRule="evenodd"
+          ></path>
+        </svg>
       </div>
       <h2 class="logo-text">TicketFlow</h2>
     </a>
 
-    <div class="nav-buttons">
-      {% if currentUser %}
-        <a href="/dashboard" class="btn btn-login"><span>Dashboard</span></a>
-        <form method="POST" action="/logout" style="display:inline">
-          <button type="submit" class="btn btn-get-started"><span>Logout</span></button>
-        </form>
-      {% else %}
-        <a href="/auth/login" class="btn btn-login"><span>Login</span></a>
-        <a href="/auth/signup" class="btn btn-get-started"><span>Get Started</span></a>
-      {% endif %}
+    <div class="nav-buttons" id="nav-buttons">
+      
     </div>
 
     <div class="mobile-menu">
-      <button class="menu-icon" onclick="toggleSidebar()">☰</button>
+      <button class="menu-icon" onclick="toggleSidebar()">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
     </div>
   </div>
 </header>
 
+<div id="sidebar-overlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+
 <div id="mobile-sidebar" class="mobile-sidebar">
   <div class="sidebar-header">
-    <a href="/" class="logo-section">
+    <div class="logo-section">
       <div class="logo-icon">
-       <svg
-                  fill="none"
-                  viewBox="0 0 48 48"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    clipRule="evenodd"
-                    d="M24 4H42V17.3333V30.6667H24V44H6V30.6667V17.3333H24V4Z"
-                    fill="currentColor"
-                    fillRule="evenodd"
-                  ></path>
-                </svg>
+        <svg
+          fill="none"
+          viewBox="0 0 48 48"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            clipRule="evenodd"
+            d="M24 4H42V17.3333V30.6667H24V44H6V30.6667V17.3333H24V4Z"
+            fill="currentColor"
+            fillRule="evenodd"
+          ></path>
+        </svg>
       </div>
       <h2 class="logo-text">TicketFlow</h2>
-    </a>
-    <button class="close-btn" onclick="closeSidebar()">✕</button>
+    </div>
+    <button class="close-btn" onclick="closeSidebar()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
   </div>
 
-  <div class="sidebar-content">
-    {% if currentUser %}
-      <div class="user-info">
-        <div class="user-avatar">👤</div>
-        <div class="user-details">
-          <p class="user-status">Signed in</p>
-        </div>
-      </div>
-      <nav class="sidebar-nav">
-        <a href="/dashboard" class="sidebar-link" onclick="closeSidebar()">Dashboard</a>
-        <form method="POST" action="/logout">
-          <button type="submit" class="sidebar-link logout">Logout</button>
-        </form>
-      </nav>
-    {% else %}
-      <nav class="sidebar-nav">
-        <a href="/auth/login" class="sidebar-link" onclick="closeSidebar()">Login</a>
-        <a href="/auth/signup" class="sidebar-link primary" onclick="closeSidebar()">Get Started</a>
-      </nav>
-    {% endif %}
+  <div class="sidebar-content" id="sidebar-content">
   </div>
 </div>
-
-<div id="sidebar-overlay" class="sidebar-overlay" onclick="closeSidebar()" style="display:none"></div>
 
 <script>
   const sidebar = document.getElementById('mobile-sidebar');
   const overlay = document.getElementById('sidebar-overlay');
+  let currentUser = null;
+
+  function initHeader() {
+    const userJSON = localStorage.getItem("ticketapp_session");
+    if (userJSON) {
+      try {
+        currentUser = JSON.parse(userJSON);
+      } catch (e) {
+        console.error("Error parsing user data:", e);
+      }
+    }
+    renderNavButtons();
+    renderSidebarContent();
+  }
+
+  function renderNavButtons() {
+    const navButtons = document.getElementById('nav-buttons');
+    if (currentUser) {
+      navButtons.innerHTML = `
+        <a href="/dashboard" class="btn btn-login"><span>Dashboard</span></a>
+        <button onclick="handleLogout()" class="btn btn-get-started"><span>Logout</span></button>
+      `;
+    } else {
+      navButtons.innerHTML = `
+        <a href="/auth/login" class="btn btn-login"><span>Login</span></a>
+        <a href="/auth/signup" class="btn btn-get-started"><span>Get Started</span></a>
+      `;
+    }
+  }
+
+  function renderSidebarContent() {
+    const sidebarContent = document.getElementById('sidebar-content');
+    if (currentUser) {
+      sidebarContent.innerHTML = `
+        <div class="user-info">
+          <div class="user-avatar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <div class="user-details">
+            <p class="user-status">Signed in</p>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="/dashboard" class="sidebar-link" onclick="closeSidebar()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="9"></rect>
+              <rect x="14" y="3" width="7" height="5"></rect>
+              <rect x="14" y="12" width="7" height="9"></rect>
+              <rect x="3" y="16" width="7" height="5"></rect>
+            </svg>
+            <span>Dashboard</span>
+          </a>
+          <button class="sidebar-link logout" onclick="handleLogout()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            <span>Logout</span>
+          </button>
+        </nav>
+      `;
+    } else {
+      sidebarContent.innerHTML = `
+        <nav class="sidebar-nav">
+          <a href="/auth/login" class="sidebar-link" onclick="closeSidebar()">
+            <span>Login</span>
+          </a>
+          <a href="/auth/signup" class="sidebar-link primary" onclick="closeSidebar()">
+            <span>Get Started</span>
+          </a>
+        </nav>
+      `;
+    }
+  }
 
   function toggleSidebar() {
     sidebar.classList.toggle('open');
-    overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+    if (sidebar.classList.contains('open')) {
+      overlay.style.display = 'block';
+    } else {
+      overlay.style.display = 'none';
+    }
   }
 
   function closeSidebar() {
     sidebar.classList.remove('open');
     overlay.style.display = 'none';
   }
+
+  function handleLogout() {
+    localStorage.removeItem("ticketapp_session");
+    currentUser = null;
+    
+    if (typeof toast !== 'undefined') {
+      toast.success("Logged out successfully");
+    } else {
+      console.log("Logged out successfully");
+    }
+    
+    closeSidebar();
+    renderNavButtons();
+    renderSidebarContent();
+    
+    window.location.href = "/";
+  }
+
+  document.addEventListener('DOMContentLoaded', initHeader);
 </script>
