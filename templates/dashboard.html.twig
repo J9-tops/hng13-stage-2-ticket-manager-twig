@@ -139,13 +139,13 @@
 
     const rows = recentTickets.map((ticket) => `
       <tr>
-        <td class="ticket-id">${ticket.uniqueNo}</td>
-        <td class="ticket-subject">${ticket.title}</td>
-        <td>
+        <td data-label="Ticket ID" class="ticket-id">${ticket.uniqueNo}</td>
+        <td data-label="Subject" class="ticket-subject"><p>${ticket.title}</p></td>
+        <td data-label="Status">
           <span class="status-badge ${getStatusClass(ticket.status)}">${ticket.status}</span>
         </td>
-        <td class="ticket-subject">${getRelativeTime(ticket.lastUpdated)}</td>
-        <td style="text-align:right;"><a class="view-link" href="#">View</a></td>
+        <td data-label="Last Updated" class="ticket-subject">${getRelativeTime(ticket.lastUpdated)}</td>
+        <td data-label="Action" style="text-align:right;"><a class="view-link" href="#">View</a></td>
       </tr>
     `).join("");
 
