@@ -1,6 +1,6 @@
 # Ticket Manager — Twig implementation
 
-This repository contains the PHP + Twig implementation of the Ticket Manager challenge. The full challenge asks for three separate frontend implementations (React, Vue.js, and Twig) that share the same layout, design language and behavior. This repo contains the Twig implementation.
+This repository contains the PHP + Twig implementation of the Ticket Manager challenge. The full challenge asks for three separate frontend implementations (React, Vue.js, and Twig) that share the same layout, design language and behavior. This repo contains the Twig implementation. To see the React implementation https://ticketflow-react.netlify.app/ and Vue implementation https://ticketflow-vue.netlify.app/
 
 This README explains what is implemented, how to run the app, where key UI pieces live, validation & auth details, accessibility notes.
 
@@ -14,7 +14,7 @@ This README explains what is implemented, how to run the app, where key UI piece
 ### What this implementation includes
 
 - Landing page with hero, CTA links, and responsive layout (see `templates/landing.html.twig`).
-- Authentication screens: Sign In and Sign Up with client-side validation (`templates/sign-in.html.twig`, `templates/sign-up.html.twig`).
+- Authentication screens: Sign In and Sign Up with client-side validation (`templates/auth/login.html.twig`, `templates/auth/signup.html.twig`).
 - Dashboard overview with cards for ticket stats and navigation to Tickets screen (`templates/dashboard.html.twig` and `templates/layouts/dashboard-layout.html.twig`).
 - Ticket management screen with modal components in `templates/components/modals/` for create/update/delete flows.
 - Session-based authentication and JSON file-based storage for users and tickets.

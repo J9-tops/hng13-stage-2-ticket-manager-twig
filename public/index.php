@@ -11,11 +11,11 @@ switch ($path) {
     echo $twig->render('landing.html.twig');
     break;
 
-  case '/sign-up':
+  case '/auth/signup':
     echo $twig->render('sign-up.html.twig');
     break;
 
-  case '/sign-in':
+  case '/auth/login':
     echo $twig->render('sign-in.html.twig');
     break;
 

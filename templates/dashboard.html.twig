@@ -58,7 +58,7 @@
 <script>
     const currentUser = localStorage.getItem("ticketapp_session");
   if (!currentUser) {
-    window.location.href = "/sign-in";
+    window.location.href = "/auth/login";
   }
 
   const tableWrapper = document.getElementById("tableWrapper");

@@ -239,6 +239,26 @@ ol {
   left: -50px;
   animation: float 8s ease-in-out infinite reverse;
 }
+@media (max-width: 768px) {
+  .app .circle-1 {
+    width: 200px;
+    height: 200px;
+  }
+  .app .circle-2 {
+    width: 150px;
+    height: 150px;
+  }
+}
+@media (max-width: 440px) {
+  .app .circle-1 {
+    width: 150px;
+    height: 150px;
+  }
+  .app .circle-2 {
+    width: 90px;
+    height: 90px;
+  }
+}
 @keyframes float {
   0%, 100% {
     transform: translateY(0px);

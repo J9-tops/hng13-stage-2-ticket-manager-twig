@@ -32,7 +32,7 @@ function confirmLogout() {
     }).showToast();
 
     setTimeout(() => {
-      window.location.href = "/sign-in";
+      window.location.href = "/auth/login";
     }, 800);
   } catch (err) {
     console.error("Logout error:", err);
